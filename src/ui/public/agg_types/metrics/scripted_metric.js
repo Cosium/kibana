@@ -6,6 +6,20 @@ export default function AggTypesMetricsScriptedMetricProvider(Private) {
   let MetricAggType = Private(AggTypesMetricsMetricAggTypeProvider);
   let fieldFormats = Private(RegistryFieldFormatsProvider);
 
+  let buildScriptParam = function (scriptName) {
+    return {
+      name: scriptName,
+      type: 'string',
+      editor: textHtml,
+      write:function (aggConfig, output) {
+        output.params[scriptName] = {
+          lang: aggConfig.params.lang,
+          inline: aggConfig.params[scriptName]
+        };
+      }
+    };
+  };
+
   return new MetricAggType({
     name: 'scripted_metric',
     title: 'Scripted Metric',
@@ -13,26 +27,18 @@ export default function AggTypesMetricsScriptedMetricProvider(Private) {
       return 'Scripted Metric';
     },
     getFormat: function () {
-      return fieldFormats.getDefaultInstance('number') || fieldFormats.getDefaultInstance('percent');
+      return fieldFormats.getDefaultInstance('number');
     },
     params: [
       {
-        name: 'init_script',
-        type: 'string',
-        editor: textHtml
-      }, {
-        name: 'map_script',
-        type: 'string',
-        editor: textHtml
-      }, {
-        name: 'combine_script',
-        type: 'string',
-        editor: textHtml
-      }, {
-        name: 'reduce_script',
-        type: 'string',
-        editor: textHtml
-      }
+        name: 'lang',
+        type: 'scripting_lang',
+        write: function () {}
+      },
+      buildScriptParam('init_script'),
+      buildScriptParam('map_script'),
+      buildScriptParam('combine_script'),
+      buildScriptParam('reduce_script')
     ]
   });
 };
