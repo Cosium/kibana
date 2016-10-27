@@ -10,8 +10,8 @@ import uiModules from 'ui/modules';
 import aggParamsTemplate from 'plugins/kibana/visualize/editor/agg_params.html';
 
 uiModules
-.get('app/visualize')
-.directive('visEditorAggParams', function ($compile, $parse, Private, Notifier, $filter) {
+.get('app/visualize', ['kibana/scripting'])
+.directive('visEditorAggParams', function ($compile, $parse, Private, Notifier, $filter, scriptingLangService) {
   const aggTypes = Private(AggTypesIndexProvider);
 
   const notify = new Notifier({
@@ -84,6 +84,12 @@ uiModules
           // if field param exists, compute allowed fields
           if (param.name === 'field') {
             $aggParamEditorsScope.indexedFields = getIndexedFields(param);
+          }
+
+          if (param.type === 'scripting_lang') {
+            scriptingLangService
+              .getScriptingLangs()
+              .then(langs => $aggParamEditorsScope.scriptingLangs = langs);
           }
 
           if ($aggParamEditorsScope.indexedFields) {
@@ -160,6 +166,7 @@ uiModules
           initialSet: fields
         });
       }
+
     }
   };
 });
