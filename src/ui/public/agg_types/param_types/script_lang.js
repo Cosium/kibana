@@ -11,6 +11,7 @@ export default function ScriptingLangAggParamFactory(Private) {
     constructor(config) {
       super(config);
 
+      this.default = 'painless';
       this.editor = editorHtml;
       this.controller = class ScriptingLangParamController {
         constructor($scope) {
